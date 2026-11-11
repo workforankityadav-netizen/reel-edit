@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@800&family=Roboto:ital,wght@0,400;0,500;0,700;1,400&family=Space+Mono:wght@400;700&display=block" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      /* Reel 2 format: two-colour gradient with starbursts, accent #FF0033, Roboto Condensed 800 heads, Space Mono pills. */
+      :root { --a: %A%; --b: %B%; --accent: #ff0033; --ink: #111111; --paper: #ffffff;
+        --font-head: "Roboto Condensed", sans-serif; --font-pill: "Space Mono", monospace; --font-body: "Roboto", sans-serif; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #ece8d6; }
+      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: var(--font-body); color: var(--ink); }
+      .clip { position: absolute; inset: 0; width: 1080px; height: 1920px; }
+      #bg { z-index: 0; overflow: hidden; background: linear-gradient(160deg, %DA% 0%, #f5f2e6 55%, %DB% 100%); }
+      .blob { position: absolute; border-radius: 50%; filter: blur(60px); }
+      #blobA { width: 900px; height: 800px; left: -300px; top: -120px; background: var(--a); }
+      #blobB { width: 1000px; height: 900px; right: -380px; top: 760px; background: var(--b); }
+      #blobC { width: 800px; height: 700px; left: -260px; bottom: -300px; background: var(--a); }
+      .star { position: absolute; width: 520px; height: 520px; right: -170px; top: 110px; }
+      .star2 { position: absolute; width: 380px; height: 380px; left: -150px; bottom: 300px; opacity: 0.6; }
+      .scene { z-index: 2; opacity: 0; }
+      .cam { position: absolute; inset: 0; transform-origin: 50% 42%; }
+      .ico { width: 1em; height: 1em; display: block; }
+      .red { color: var(--accent); }
+
+      .stack { position: absolute; left: 50px; right: 50px; top: 190px; height: 1120px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 36px; text-align: center; }
+      .hl { font-family: var(--font-head); font-weight: 800; font-size: 138px; line-height: .96; letter-spacing: -0.02em; }
+      .hl .w { display: inline-block; }
+      .hl.md { font-size: 104px; } .hl.sm { font-size: 78px; } .hl.lg { font-size: 176px; }
+      .sub { font-style: italic; font-weight: 500; font-size: 54px; line-height: 1.2; color: #222; }
+      .kick { display: inline-flex; align-items: center; min-height: 72px; padding: 8px 36px; background: var(--paper); border: 3px solid var(--ink); border-radius: 40px; box-shadow: 6px 6px 0 var(--ink); font-family: var(--font-pill); font-weight: 700; font-size: 36px; letter-spacing: .06em; }
+      .kick.big { font-size: 58px; min-height: 104px; padding: 8px 46px; border-radius: 54px; color: var(--accent); }
+      .tile { display: flex; align-items: center; justify-content: center; color: #fff; flex: none; box-shadow: 0 22px 44px rgba(40,20,80,.28), 0 0 0 6px rgba(255,255,255,.7); }
+      .tile.logo { background: none; box-shadow: none; filter: drop-shadow(0 16px 26px rgba(40,20,80,.35)); } .tile.logo img { object-fit: contain; display: block; }
+      .ui { position: relative; background: var(--paper); border-radius: 34px; box-shadow: 0 34px 70px rgba(40,20,80,.22), 0 0 0 6px rgba(255,255,255,.7); }
+      .chip { display: inline-flex; align-items: center; gap: 14px; height: 84px; padding: 0 34px 0 14px; background: var(--paper); border: 3px solid var(--ink); border-radius: 44px; box-shadow: 6px 6px 0 var(--ink); font-family: var(--font-pill); font-weight: 700; font-size: 34px; white-space: nowrap; }
+      .ci { width: 58px; height: 58px; border-radius: 50%; background: var(--ink); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 34px; } .ci.red { background: var(--accent); } .ci.green { background: #17a34a; }
+      .chiprow { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+
+      .topic { position: absolute; left: 50px; top: 130px; z-index: 7; display: flex; align-items: center; }
+      .topic .dot { width: 84px; height: 84px; border-radius: 50%; background: var(--ink); color: #ffe14d; display: flex; align-items: center; justify-content: center; font-size: 46px; position: relative; z-index: 2; }
+      .tbody { margin-left: -18px; padding: 0 34px 0 40px; height: 76px; display: flex; align-items: center; background: var(--paper); border: 3px solid var(--ink); border-radius: 40px; box-shadow: 6px 6px 0 var(--ink); font-family: var(--font-pill); font-size: 33px; letter-spacing: .05em; white-space: nowrap; }
+
+      .stat { display: flex; align-items: baseline; justify-content: center; font-family: var(--font-head); font-weight: 800; line-height: .92; flex-wrap: wrap; row-gap: 26px; }
+      .stat .count { font-size: 290px; color: var(--accent); text-shadow: 10px 10px 0 var(--ink); letter-spacing: -0.03em; }
+      .stat small { font-size: 112px; margin-left: 20px; }
+
+      .cells { display: flex; flex-wrap: wrap; justify-content: center; gap: 44px 50px; }
+      .cell { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 440px; } .cell b { font-family: var(--font-head); font-weight: 800; font-size: 56px; line-height: 1.02; }
+      .list { width: 960px; padding: 30px 40px; display: flex; flex-direction: column; gap: 26px; text-align: left; }
+      .row2 { display: flex; align-items: center; gap: 26px; font-family: var(--font-head); font-weight: 800; font-size: 58px; line-height: 1.04; }
+      .ri { width: 84px; height: 84px; border-radius: 24px; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 50px; flex: none; }
+      .flow { display: flex; flex-direction: column; align-items: center; gap: 0; }
+      .fstep { display: flex; align-items: center; gap: 24px; width: 900px; padding: 20px 32px 20px 20px; background: var(--paper); border-radius: 28px; box-shadow: 0 20px 44px rgba(40,20,80,.2), 0 0 0 5px rgba(255,255,255,.7); font-family: var(--font-head); font-weight: 800; font-size: 56px; line-height: 1.04; text-align: left; }
+      .fi { width: 94px; height: 94px; border-radius: 26px; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 54px; flex: none; }
+      .farr { display: block; width: 10px; height: 44px; background: var(--ink); transform-origin: top center; border-radius: 5px; }
+      .vs { width: 960px; padding: 32px; display: flex; gap: 30px; align-items: center; text-align: left; } .vs > div:last-child { display: flex; flex-direction: column; gap: 6px; } .vs b { font-family: var(--font-head); font-weight: 800; font-size: 76px; line-height: 1; } .vs span { font-size: 44px; font-weight: 500; line-height: 1.12; }
+      .vs.no b { color: var(--accent); text-decoration: line-through; text-decoration-thickness: 8px; }
+      .vsb { width: 110px; height: 110px; border-radius: 50%; background: var(--ink); color: #fff; font-family: var(--font-head); font-weight: 800; font-size: 50px; display: flex; align-items: center; justify-content: center; margin: -16px 0; z-index: 2; }
+
+      .capt { position: absolute; left: 40px; right: 40px; top: 225px; text-align: center; }
+      .studio { position: absolute; left: 60px; top: 370px; width: 960px; padding: 34px 40px 18px; }
+      .sbar { display: flex; align-items: center; gap: 18px; font-size: 44px; } .sbar img { width: 66px; height: 66px; object-fit: contain; }
+      .stabs { display: flex; gap: 34px; margin: 20px 0 8px; font-size: 32px; color: #666; } .stabs b { color: var(--ink); border-bottom: 5px solid var(--ink); padding-bottom: 8px; }
+      .srow { display: flex; align-items: center; gap: 26px; padding: 22px 0; border-top: 2px solid #f0f0f0; }
+      .sth { width: 200px; height: 112px; border-radius: 16px; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 48px; flex: none; }
+      .th0 { background: linear-gradient(135deg,#7c6cf0,#c9b8f0); } .th1 { background: linear-gradient(135deg,#f2a33a,#f2ee3a); } .th2 { background: linear-gradient(135deg,#3ac2f2,#9fe3c9); } .th3 { background: linear-gradient(135deg,#f23a7c,#f7b48a); }
+      .sli { flex: 1; text-align: left; } .sli i { display: block; height: 22px; border-radius: 11px; background: #e6e3ee; margin: 10px 0; } .sli i + i { width: 60%; background: #f0eef5; } .sli b { font-family: var(--font-head); font-weight: 800; font-size: 44px; line-height: 1.02; display: block; }
+      .svw { width: 170px; text-align: right; font-family: var(--font-head); font-weight: 800; font-size: 72px; } .svw.red { color: var(--accent); }
+      .stampx { position: absolute; left: 90px; right: 90px; top: 830px; z-index: 5; text-align: center; padding: 16px 30px; border: 11px solid var(--accent); border-radius: 26px; color: var(--accent); font-family: var(--font-head); font-weight: 800; font-size: 118px; line-height: 1; background: rgba(255,255,255,.9); transform: rotate(-6deg); }
+
+      .chart { position: absolute; left: 60px; top: 290px; width: 960px; padding: 32px 30px 16px; }
+      .cttl { font-family: var(--font-pill); font-weight: 700; font-size: 34px; color: #555; margin-left: 10px; }
+      .clab { position: absolute; padding: 10px 24px; border-radius: 28px; background: var(--ink); color: #fff; font-family: var(--font-pill); font-weight: 700; font-size: 32px; white-space: nowrap; } .clab.red { background: var(--accent); } .clab.green { background: #17a34a; }
+      .under { position: absolute; left: 40px; right: 40px; top: 975px; text-align: center; }
+      .bars { width: 960px; padding: 36px 40px; display: flex; flex-direction: column; gap: 30px; }
+      .bl { display: flex; justify-content: space-between; align-items: baseline; font-family: var(--font-head); font-weight: 800; font-size: 56px; text-align: left; } .bt { height: 42px; border-radius: 21px; background: #eee; overflow: hidden; margin-top: 8px; } .bt i { display: block; height: 100%; transform-origin: left center; border-radius: 21px; }
+      .meter { width: 760px; height: 430px; overflow: visible; }
+      .toggle { position: absolute; left: 70px; top: 330px; width: 940px; padding: 36px 40px; }
+      .tq { font-family: var(--font-head); font-weight: 800; font-size: 64px; line-height: 1.04; margin: 26px 0 16px; }
+      .opt { display: flex; align-items: center; gap: 26px; padding: 24px 22px; font-size: 52px; font-weight: 500; border-radius: 20px; } .opt.sel { background: #f2f7ff; }
+      .rad { width: 52px; height: 52px; border-radius: 50%; border: 5px solid #888; position: relative; flex: none; } .rad i { position: absolute; inset: 8px; border-radius: 50%; background: var(--accent); }
+      .opt:not(.sel) .rad i { display: none; }
+      .cursor { position: absolute; z-index: 9; width: 90px; height: 90px; filter: drop-shadow(4px 6px 6px rgba(0,0,0,.3)); }
+      .fphone { position: absolute; left: 280px; top: 220px; width: 520px; height: 950px; border-radius: 66px; background: #111; padding: 18px; box-shadow: 0 34px 70px rgba(40,20,80,.35), 0 0 0 6px rgba(255,255,255,.7); }
+      .fscreen { position: relative; width: 100%; height: 100%; border-radius: 50px; overflow: hidden; background: linear-gradient(160deg,#7c6cf0,#f23a7c); }
+      .fscreen.b { background: linear-gradient(160deg,#3ac2f2,#7c6cf0); } .fscreen.c { background: linear-gradient(160deg,#f2a33a,#f23a7c); } .fscreen.d { background: linear-gradient(160deg,#111827,#374151); }
+      .fplay { position: absolute; left: 180px; top: 340px; width: 130px; height: 130px; border-radius: 50%; background: rgba(255,255,255,.9); color: #111; display: flex; align-items: center; justify-content: center; font-size: 66px; }
+      .fside { position: absolute; right: 18px; bottom: 170px; display: flex; flex-direction: column; gap: 26px; } .fside i { width: 72px; height: 72px; border-radius: 50%; background: rgba(0,0,0,.35); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 42px; }
+      .fmeta { position: absolute; left: 26px; bottom: 44px; width: 320px; } .fmeta i { display: block; height: 22px; border-radius: 11px; background: rgba(255,255,255,.75); margin-top: 12px; } .fmeta i + i { width: 62%; }
+      .swipe { position: absolute; left: 50%; top: 60%; transform: translateX(-50%); padding: 18px 34px; border-radius: 40px; background: var(--accent); color: #fff; display: flex; align-items: center; gap: 14px; font-family: var(--font-head); font-weight: 800; font-size: 54px; white-space: nowrap; }
+      .fnote { position: absolute; left: 30px; right: 30px; top: 1190px; text-align: center; z-index: 3; }
+      .crowd { display: grid; grid-template-columns: repeat(8, 1fr); gap: 16px; width: 900px; } .dotp { font-size: 90px; color: #1f2937; display: block; }
+      .lockw, .banw { position: relative; width: 420px; height: 400px; display: flex; align-items: center; justify-content: center; }
+      .chains { position: absolute; inset: 40px -20px; background: repeating-linear-gradient(135deg, rgba(17,17,17,.85) 0 16px, transparent 16px 54px); border-radius: 30px; }
+      .lockb { position: absolute; right: -30px; bottom: -20px; }
+      .bansvg { position: absolute; inset: -20px; width: 460px; height: 440px; }
+      .cbox { position: absolute; left: 70px; top: 380px; width: 940px; padding: 38px; }
+      .chdr { display: flex; align-items: center; gap: 16px; font-size: 46px; margin-bottom: 26px; } .chdr .ico { color: var(--accent); }
+      .cin { display: flex; gap: 24px; align-items: flex-start; } .cav { width: 100px; height: 100px; border-radius: 50%; background: var(--a); display: flex; align-items: center; justify-content: center; font-size: 56px; flex: none; }
+      .cfield { flex: 1; min-height: 96px; padding: 14px 4px; border-bottom: 5px solid var(--ink); font-size: 54px; line-height: 1.2; font-weight: 500; }
+      .caret { display: inline-block; width: 5px; height: 54px; background: var(--ink); vertical-align: middle; margin-left: 4px; }
+      .subbtn { position: absolute; left: 150px; top: 810px; width: 780px; height: 180px; border-radius: 90px; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; gap: 28px; font-family: var(--font-head); font-weight: 800; font-size: 104px; box-shadow: 0 30px 60px rgba(255,0,51,.35); }
+      .confetti i { position: absolute; left: 540px; top: 900px; width: 22px; height: 34px; border-radius: 5px; opacity: 0; }
+      .calcard { width: 500px; overflow: hidden; text-align: center; } .calt { background: var(--accent); color: #fff; font-family: var(--font-head); font-weight: 800; font-size: 64px; padding: 16px; } .cald { font-family: var(--font-head); font-weight: 800; font-size: 210px; line-height: 1.05; } .caly { font-family: var(--font-pill); font-weight: 700; font-size: 44px; padding-bottom: 20px; }
+      .cells2 { display: flex; gap: 30px; } .mapc { width: 470px; padding: 34px 16px; text-align: center; } .flag { font-family: var(--font-pill); font-weight: 700; font-size: 42px; } .mnum { font-family: var(--font-head); font-weight: 800; font-size: 92px; line-height: 1.04; margin: 12px 0; white-space: nowrap; } .mapc small { font-size: 34px; font-weight: 500; }
+      .searchc { position: absolute; left: 60px; top: 300px; width: 960px; padding: 32px 36px; }
+      .sbx { display: flex; align-items: center; gap: 20px; height: 100px; padding: 0 28px; border: 4px solid var(--ink); border-radius: 50px; font-size: 48px; margin-bottom: 12px; } .sbx img { width: 84px; height: 60px; object-fit: contain; }
+      .clockw { width: 340px; height: 340px; } .clockw svg { width: 100%; height: 100%; filter: drop-shadow(0 20px 30px rgba(40,20,80,.3)); }
+
+      .wipe { z-index: 8; pointer-events: none; opacity: 0; }
+      .wipe .panel { position: absolute; left: -100px; width: 1280px; top: 0; height: 2600px; background: radial-gradient(50% 30% at 20% 30%, var(--a), transparent 70%), radial-gradient(60% 30% at 85% 65%, var(--b), transparent 70%), linear-gradient(170deg, %DA%, %DB%); }
+      .wipe svg { position: absolute; left: -100px; width: 1280px; height: 340px; overflow: visible; }
+      .wipe .rt { top: -170px; } .wipe .rb { bottom: -170px; }
+      .ribbon-band { fill: none; stroke: #fff; stroke-width: 64; } .ribbon-edge { fill: none; stroke: var(--ink); stroke-width: 70; }
+      .ribbon-text { font-family: var(--font-pill); font-size: 30px; letter-spacing: .14em; fill: var(--ink); }
+      #flash { z-index: 9; background: #fff; opacity: 0; pointer-events: none; }
+      #caps { position: absolute; z-index: 7; left: 50px; right: 50px; top: 1350px; height: 220px; }
+      .cap { position: absolute; left: 0; right: 0; top: 0; text-align: center; opacity: 0; font-family: var(--font-head); font-weight: 800; font-size: 86px; line-height: 1.02; color: #fff; -webkit-text-stroke: 14px #000; paint-order: stroke fill; text-shadow: 0 6px 0 rgba(0,0,0,.55); }
+      .cap b { color: #ffe14d; font-weight: 800; }
+
+      /* footage mode: person in the bottom half, graphics in the top half, full=True scenes take the whole frame */
+      body.footage #pv { position: absolute; left: 0; top: 960px; width: 1080px; height: 960px; object-fit: cover; z-index: 3; }
+      body.footage .pvshade { position: absolute; left: 0; top: 960px; width: 1080px; height: 960px; z-index: 4; pointer-events: none; box-shadow: inset 0 14px 0 rgba(255,255,255,.9), inset 0 40px 50px -20px rgba(0,0,0,.35); }
+      body.footage .scene:not(.full) .fit { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform: translateY(-62px) scale(.74); transform-origin: 50% 0; }
+      body.footage .scene.full { z-index: 5; }
+      body.footage #caps { top: 830px; z-index: 8; }
+    </style>
+  </head>
+  <body class="%MODE%">
+    <div id="root" data-composition-id="main" data-start="0" data-duration="%TOTAL%" data-width="1080" data-height="1920">
+      <div id="bg" class="clip" data-start="0" data-duration="%TOTAL%" data-track-index="0">
+        <div class="blob" id="blobA"></div><div class="blob" id="blobB"></div><div class="blob" id="blobC"></div>
+        <svg class="star" viewBox="-50 -50 100 100"><path class="burst" fill="%SA%" /></svg>
+        <svg class="star2" viewBox="-50 -50 100 100"><path class="burst" fill="%SB%" /></svg>
+      </div>
+%SCENES%
+%PERSON%
+      <div class="pvshade" id="pvs"></div>
+      <div id="caps">%CAPS%</div>
+%WIPES%
+      <div id="flash" class="clip" data-start="0" data-duration="%TOTAL%" data-track-index="5"></div>
+    </div>
+    <script>
+      const TOTAL = %TOTAL%;
+      const q = (s, r = document) => Array.from(r.querySelectorAll(s));
+      const starPath = (() => { let d = ""; for (let i = 0; i < 24; i++) { const r = i % 2 === 0 ? 48 : 30, a = (Math.PI * i) / 12; d += (i ? "L" : "M") + (r * Math.cos(a)).toFixed(2) + " " + (r * Math.sin(a)).toFixed(2); } return d + "Z"; })();
+      q("path.burst").forEach((p) => p.setAttribute("d", starPath));
+      const wave = "M0 170 C 160 60, 320 60, 480 170 S 800 280, 960 170 S 1280 60, 1440 170";
+      const BRAND = "%BRAND%"; const ribbonText = BRAND ? Array(12).fill(BRAND + " ✦ ").join("") : "";
+      q(".wipe").forEach((el, i) => {
+        const band = (cls, pid) => '<svg class="' + cls + '" viewBox="0 0 1280 340"><defs><path id="' + pid + '" d="' + wave + '"/></defs><use href="#' + pid + '" class="ribbon-edge"/><use href="#' + pid + '" class="ribbon-band"/><text class="ribbon-text" dy="10"><textPath href="#' + pid + '" startOffset="0">' + ribbonText + "</textPath></text></svg>";
+        el.innerHTML = '<div class="panel">' + band("rt", "rp" + i + "a") + band("rb", "rp" + i + "b") + "</div>";
+      });
+
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo(".star", { rotation: 0 }, { rotation: 60, duration: TOTAL, ease: "none" }, 0);
+      tl.fromTo(".star2", { rotation: 0 }, { rotation: -50, duration: TOTAL, ease: "none" }, 0);
+      const scenes = q(".scene");
+      const wipes = q(".wipe").map((w) => +w.dataset.wipe);
+      const isWipe = (t) => wipes.some((w) => Math.abs(w - t) < 0.01);
+      scenes.forEach((sc, i) => {
+        const a = +sc.dataset.in, b = +sc.dataset.out, cam = sc.querySelector(".cam");
+        tl.to("#blobA", { x: (i % 2 ? 1 : -1) * 120, y: (i % 3) * 60, duration: 1.4, ease: "sine.inOut" }, a);
+        tl.to("#blobB", { x: (i % 2 ? -1 : 1) * 140, y: -(i % 3) * 70, duration: 1.4, ease: "sine.inOut" }, a);
+        tl.set(sc, { opacity: 0 }, 0);
+        if (isWipe(a) || a === 0) tl.set(sc, { opacity: 1, scale: 1, filter: "blur(0px)" }, a);
+        else tl.fromTo(sc, { opacity: 0, scale: 0.9, filter: "blur(14px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.3, ease: "power3.out", immediateRender: false }, a - 0.04);
+        if (i < scenes.length - 1) {
+          if (isWipe(b)) tl.set(sc, { opacity: 0 }, b);
+          else tl.to(sc, { opacity: 0, scale: 1.12, filter: "blur(14px)", duration: 0.2, ease: "power2.in" }, b - 0.16);
+        }
+        tl.fromTo(cam, { scale: 1 }, { scale: 1.05, duration: b - a + 0.3, ease: "none", immediateRender: false }, a);
+      });
+
+      const FX = {
+        pop: [{ opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.34, ease: "back.out(2.4)" }],
+        up: [{ opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.38, ease: "power3.out" }],
+        rise: [{ opacity: 0, y: 70 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }],
+        left: [{ opacity: 0, x: -90 }, { opacity: 1, x: 0, duration: 0.34, ease: "power3.out" }],
+        right: [{ opacity: 0, x: 90 }, { opacity: 1, x: 0, duration: 0.34, ease: "power3.out" }],
+        word: [{ opacity: 0, y: 50, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.28, ease: "back.out(2)" }],
+        stamp: [{ opacity: 0, scale: 1.9 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power4.out" }],
+        growx: [{ scaleX: 0 }, { scaleX: 1, duration: 0.6, ease: "power3.out" }],
+        growy: [{ scaleY: 0 }, { scaleY: 1, duration: 0.2, ease: "power2.out" }],
+      };
+      q("[data-at]").forEach((el) => {
+        const at = +el.dataset.at, fx = el.dataset.fx;
+        if (el.classList.contains("type") || el.classList.contains("count")) return;
+        if (fx === "draw") { gsap.set(el, { strokeDasharray: 1, strokeDashoffset: 1 }); tl.to(el, { strokeDashoffset: 0, duration: +(el.dataset.dur || 1), ease: "power2.inOut" }, at); return; }
+        if (fx === "cursor") {
+          const click = +el.dataset.click;
+          tl.fromTo(el, { opacity: 0, x: 420, y: 520 }, { opacity: 1, x: 0, y: 0, duration: 0.45, ease: "power3.out" }, at);
+          tl.to(el, { scale: 0.78, duration: 0.07, yoyo: true, repeat: 1 }, click);
+          return;
+        }
+        const f = FX[fx] || FX.pop;
+        tl.fromTo(el, f[0], Object.assign({}, f[1]), at);
+        if (fx === "stamp") { tl.fromTo("#flash", { opacity: 0.32 }, { opacity: 0, duration: 0.25, ease: "power2.out", immediateRender: false }, at); }
+      });
+      q(".count").forEach((el) => {
+        const raw = el.dataset.to, n = +raw.replace(/,/g, ""), pre = el.dataset.pre || "", at = +el.dataset.at, dur = +el.dataset.dur;
+        if (!isFinite(n) || !/^[\d,]+$/.test(raw)) return;
+        const o = { v: +el.dataset.from || 0 }, fmt = (v) => pre + (raw.includes(",") ? Math.round(v).toLocaleString("en-US") : String(Math.round(v)));
+        el.textContent = fmt(o.v);
+        tl.to(o, { v: n, duration: dur, ease: "power2.out", onUpdate: () => (el.textContent = fmt(o.v)) }, at);
+      });
+      q(".type").forEach((el) => {
+        const txt = el.dataset.text, o = { n: 0 }; el.textContent = "";
+        tl.to(o, { n: txt.length, duration: +el.dataset.dur, ease: "none", onUpdate: () => (el.textContent = txt.slice(0, Math.round(o.n))) }, +el.dataset.at);
+      });
+      q(".caret").forEach((el) => tl.to(el, { opacity: 0, duration: 0.35, repeat: 240, yoyo: true, ease: "steps(1)" }, 0));
+      q("[data-swing]").forEach((el) => { gsap.set(el, { rotation: -80, svgOrigin: "300 300" }); tl.to(el, { rotation: +el.dataset.to, duration: 0.9, ease: "elastic.out(1,0.45)" }, +el.dataset.swing); });
+      q("[data-spin2]").forEach((el) => { gsap.set(el, { svgOrigin: "100 100" }); tl.to(el, { rotation: 1080, duration: 2.2, ease: "power2.inOut" }, +el.dataset.spin2); });
+      q("[data-fade]").forEach((el) => tl.to(el, { opacity: 0.12, scale: 0.8, duration: 0.25 }, +el.dataset.fade));
+      q(".fplay[data-out]").forEach((el) => tl.to(el, { opacity: 0, duration: 0.15 }, +el.dataset.out));
+      q("[data-conf]").forEach((el) => {
+        const a = +el.dataset.conf, i = +el.dataset.i, an = (i * 137.5 * Math.PI) / 180, r = 320 + (i % 5) * 70;
+        tl.fromTo(el, { opacity: 1, x: 0, y: 0, rotation: 0 }, { x: Math.cos(an) * r, y: Math.sin(an) * r + 220, rotation: 360 + i * 40, duration: 1.0, ease: "power2.out", immediateRender: false }, a);
+        tl.to(el, { opacity: 0, duration: 0.25 }, a + 0.85);
+      });
+      q(".wipe").forEach((el) => {
+        const t = +el.dataset.wipe;
+        tl.set(el, { opacity: 1 }, t - 0.32);
+        tl.fromTo(el.querySelector(".panel"), { y: 1960 }, { y: -2640, duration: 0.64, ease: "power1.inOut", immediateRender: false }, t - 0.32);
+        q("textPath", el).forEach((p) => tl.fromTo(p, { attr: { startOffset: 0 } }, { attr: { startOffset: -400 }, duration: 0.64, ease: "none", immediateRender: false }, t - 0.32));
+        tl.set(el, { opacity: 0 }, t + 0.33);
+      });
+      q(".cap").forEach((el) => {
+        const a = +el.dataset.in, b = +el.dataset.out;
+        tl.set(el, { opacity: 0 }, 0);
+        tl.fromTo(el, { opacity: 1, scale: 0.86 }, { opacity: 1, scale: 1, duration: 0.12, ease: "back.out(2.5)", immediateRender: false }, a);
+        tl.set(el, { opacity: 0 }, b);
+      });
+      const FULLS = %FULLS%;
+      if (document.body.classList.contains("footage")) {
+        FULLS.forEach(([a, b]) => {
+          tl.to(["#pv", "#pvs"], { opacity: 0, y: 160, duration: 0.3, ease: "power2.in" }, a - 0.2);
+          tl.set("#caps", { top: 1350 }, a);
+          tl.to(["#pv", "#pvs"], { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, b - 0.1);
+          tl.set("#caps", { top: 830 }, b);
+        });
+      } else { const s = document.getElementById("pvs"); if (s) s.remove(); }
+      tl.set({}, {}, TOTAL);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
